@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'CoolWear') | CoolWear – Premium Fashion</title>
     <meta name="description" content="@yield('meta_description', 'CoolWear – Thương hiệu thời trang cao cấp. Khám phá bộ sưu tập mới nhất.')">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     <script>
         window.appConfig = {
             urls: {

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Dashboard') | Hệ Thống Quản Trị</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +21,10 @@
     <div class="flex h-screen overflow-hidden">
         {{-- Sidebar --}}
         <aside class="w-64 bg-gray-900 border-r border-gray-800 hidden md:flex flex-col flex-shrink-0">
-            <div class="h-16 flex items-center justify-center border-b border-gray-800">
-                <a href="{{ route('admin.dashboard') }}" class="text-white font-bold text-xl tracking-wider">
-                    COOL<span class="text-[#C5A572]">WEAR</span> <span class="text-xs font-normal text-gray-400">ADMIN</span>
+            <div class="h-16 flex items-center justify-center border-b border-gray-800 px-4">
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-gray-950 px-4 py-2 font-bold text-xl tracking-wider shadow-sm">
+                    <span style="color: #f8fafc;">COOL</span><span class="text-[#C5A572]">WEAR</span>
+                    <span class="rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em] text-gray-300">ADMIN</span>
                 </a>
             </div>
 

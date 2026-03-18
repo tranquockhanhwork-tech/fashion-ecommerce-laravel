@@ -73,8 +73,17 @@ class Product extends Model
      */
     public function getThumbnailAttribute(): string
     {
-        return $this->primaryImage?->image_url
-            ?? 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80';
+        $imageUrl = $this->primaryImage?->image_url;
+
+        if (! $imageUrl) {
+            return 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80';
+        }
+
+        if (str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://')) {
+            return $imageUrl;
+        }
+
+        return asset('storage/' . ltrim($imageUrl, '/'));
     }
 
     /**

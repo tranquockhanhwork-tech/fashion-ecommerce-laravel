@@ -22,7 +22,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form id="product-create-form" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Tên sản phẩm -->
@@ -49,7 +49,7 @@
             <!-- Ảnh đại diện -->
             <div>
                 <label for="image_url" class="block text-sm font-medium text-gray-700 mb-1">Ảnh Đại Diện</label>
-                <input type="file" id="image_url" name="image_url" accept="image/*"
+                <input type="file" id="image_url" name="image_url" accept="image/*" data-optional-file
                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 border p-1 rounded-md">
             </div>
 
@@ -89,3 +89,15 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('product-create-form')?.addEventListener('submit', function () {
+    document.querySelectorAll('[data-optional-file]').forEach((input) => {
+        if (!input.files || input.files.length === 0) {
+            input.disabled = true;
+        }
+    });
+});
+</script>
+@endpush
