@@ -21,7 +21,6 @@ class CategoryController extends Controller
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('slug', 'like', '%' . $search . '%');
             })
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate(12)
             ->withQueryString();
@@ -42,7 +41,6 @@ class CategoryController extends Controller
     public function create()
     {
         $parentCategories = Category::query()
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
@@ -64,7 +62,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $parentCategories = Category::query()
             ->whereKeyNot($category->id)
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
@@ -113,7 +110,6 @@ class CategoryController extends Controller
             ],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'sort_order' => ['nullable', 'integer', 'min:0', 'max:255'],
         ]);
     }
 

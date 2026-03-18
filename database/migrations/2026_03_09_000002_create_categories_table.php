@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique(); // Dùng cho URL SEO-friendly
             $table->text('description')->nullable();
-            $table->unsignedTinyInteger('sort_order')->default(0); // Thứ tự hiển thị
             $table->timestamps();
         });
     }
