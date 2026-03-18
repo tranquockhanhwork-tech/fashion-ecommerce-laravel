@@ -200,11 +200,11 @@
 
 @push('scripts')
 <script>
-const BASE = '/fashion-ecommerce-laravel/public';
+const APP_URLS = window.appConfig?.urls || {};
 
 async function loadAddrProvinces() {
     const sel = document.getElementById('addr-province');
-    const res  = await fetch(`${BASE}/shipping/provinces`).catch(() => null);
+    const res  = await fetch(APP_URLS.shippingProvinces || `{{ route('shipping.provinces') }}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     sel.innerHTML = '<option value="">-- Chọn tỉnh/thành --</option>';
@@ -223,7 +223,8 @@ async function onProvinceChange(sel) {
     wSel.innerHTML = '<option value="">-- Chọn huyện trước --</option>';
     wSel.disabled  = true;
     if (!pid) return;
-    const res  = await fetch(`${BASE}/shipping/districts/${pid}`).catch(() => null);
+    const districtsBase = APP_URLS.shippingDistrictsBase || `{{ url('/shipping/districts') }}`;
+    const res  = await fetch(`${districtsBase}/${pid}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     dSel.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
@@ -240,7 +241,8 @@ async function onDistrictChange(sel) {
     wSel.innerHTML = '<option value="">Đang tải...</option>';
     wSel.disabled  = true;
     if (!did) return;
-    const res  = await fetch(`${BASE}/shipping/wards/${did}`).catch(() => null);
+    const wardsBase = APP_URLS.shippingWardsBase || `{{ url('/shipping/wards') }}`;
+    const res  = await fetch(`${wardsBase}/${did}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     wSel.innerHTML = '<option value="">-- Chọn phường/xã --</option>';

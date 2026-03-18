@@ -50,4 +50,16 @@ return [
         'sender_province_name' => env('VTP_SENDER_PROVINCE_NAME', 'TP. Hồ Chí Minh'),
     ],
 
+    'vietqr' => [
+        'base_url'     => env('VIETQR_BASE_URL', 'https://api.vietqr.io'),
+        'client_id'    => env('VIETQR_CLIENT_ID', ''),
+        'api_key'      => env('VIETQR_API_KEY', ''),
+        'bank_name'    => env('VIETQR_BANK_NAME', ''),
+        'acq_id'       => env('VIETQR_ACQ_ID', ''),
+        'account_no'   => env('VIETQR_ACCOUNT_NO', ''),
+        'account_name' => env('VIETQR_ACCOUNT_NAME', ''),
+        'template'     => env('VIETQR_TEMPLATE', 'compact2'),
+        'format'       => env('VIETQR_FORMAT', 'jpg'),
+    ],
+
 ];

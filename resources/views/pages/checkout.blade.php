@@ -275,8 +275,8 @@
 
 @push('scripts')
 <script>
-const BASE = '/fashion-ecommerce-laravel/public';
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
+const APP_URLS = window.appConfig?.urls || {};
 
 /* ===== CHỌN ĐỊA CHỈ ĐÃ LƯU ===== */
 let _currentAddress = null;
@@ -315,7 +315,7 @@ async function calcShippingFee() {
     result.innerHTML = '';
 
     try {
-        const res  = await fetch(`${BASE}/shipping/calculate-fee`, {
+        const res  = await fetch(APP_URLS.shippingFee || `{{ route('shipping.fee') }}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
             body: JSON.stringify({ 
@@ -380,7 +380,7 @@ function updateOrderTotal(shippingFee) {
 async function loadProvinces() {
     const sel = document.getElementById('vtp-province');
     if (!sel) return;
-    const res  = await fetch(`${BASE}/shipping/provinces`).catch(() => null);
+    const res  = await fetch(APP_URLS.shippingProvinces || `{{ route('shipping.provinces') }}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     sel.innerHTML = '<option value="">-- Chọn tỉnh/thành --</option>';
@@ -394,7 +394,8 @@ document.getElementById('vtp-province')?.addEventListener('change', async functi
     dSel.innerHTML = '<option value="">Đang tải...</option>'; dSel.disabled = true;
     wSel.innerHTML = '<option value="">-- Chọn huyện trước --</option>'; wSel.disabled = true;
     if (!pid) return;
-    const res = await fetch(`${BASE}/shipping/districts/${pid}`).catch(() => null);
+    const districtsBase = APP_URLS.shippingDistrictsBase || `{{ url('/shipping/districts') }}`;
+    const res = await fetch(`${districtsBase}/${pid}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     dSel.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
@@ -407,7 +408,8 @@ document.getElementById('vtp-district')?.addEventListener('change', async functi
     const wSel = document.getElementById('vtp-ward');
     wSel.innerHTML = '<option value="">Đang tải...</option>'; wSel.disabled = true;
     if (!did) return;
-    const res = await fetch(`${BASE}/shipping/wards/${did}`).catch(() => null);
+    const wardsBase = APP_URLS.shippingWardsBase || `{{ url('/shipping/wards') }}`;
+    const res = await fetch(`${wardsBase}/${did}`).catch(() => null);
     if (!res) return;
     const json = await res.json();
     wSel.innerHTML = '<option value="">-- Chọn phường/xã --</option>';

@@ -31,6 +31,7 @@
 
         {{-- Cart Items --}}
         <div class="lg:col-span-2 space-y-4">
+            <div data-cart-page-items class="space-y-4">
 
             @if($cartItems->isNotEmpty())
 
@@ -41,7 +42,7 @@
                     $img       = $ci->variant->product->thumbnail;
                     $prodId    = $ci->variant->product_id;
                 @endphp
-                <div class="bg-[#111] border border-[#1a1a1a] p-5 flex gap-5 hover:border-[#2a2a2a] transition-colors">
+                <div class="bg-[#111] border border-[#1a1a1a] p-5 flex gap-5 hover:border-[#2a2a2a] transition-colors" data-cart-item="{{ $ci->id }}">
                     <a href="{{ route('shop.show', $prodId) }}" class="w-24 h-28 flex-shrink-0 bg-[#1a1a1a] overflow-hidden">
                         <img src="{{ $img }}" alt="{{ $ci->variant->product->name }}" class="w-full h-full object-cover">
                     </a>
@@ -54,14 +55,11 @@
                                     @if($ci->variant->color) | Màu: {{ $ci->variant->color }} @endif
                                 </div>
                             </div>
-                            <form action="{{ route('cart.remove', $ci->id) }}" method="POST" class="inline">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="text-gray-600 hover:text-red-400 transition-colors p-1" title="Xóa">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </form>
+                            <button type="button" class="cart-remove-btn" data-cart-remove="{{ $ci->id }}" title="Xóa sản phẩm khỏi giỏ hàng" aria-label="Xóa sản phẩm khỏi giỏ hàng">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
                         </div>
                         <div class="flex items-center justify-between mt-3">
                             <div data-qty-control class="flex items-center">
@@ -98,6 +96,18 @@
                     <a href="{{ route('shop.index') }}" class="btn-primary px-8 py-3">Tiếp Tục Mua Sắm</a>
                 </div>
             @endif
+            </div>
+
+            <template id="cart-page-empty-template">
+                <div class="bg-[#111] border border-[#1a1a1a] p-16 text-center flex flex-col items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-[#2a2a2a] mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/>
+                    </svg>
+                    <h3 class="font-[Outfit] font-bold text-xl text-white mb-2">Giỏ hàng trống</h3>
+                    <p class="text-gray-500 mb-8">Bạn chưa thêm bất kỳ sản phẩm nào vào giỏ hàng.</p>
+                    <a href="{{ route('shop.index') }}" class="btn-primary px-8 py-3">Tiếp Tục Mua Sắm</a>
+                </div>
+            </template>
 
             <div class="flex items-center justify-between pt-2">
                 <a href="{{ route('shop.index') }}" class="flex items-center gap-2 text-gray-400 hover:text-[#C5A572] text-sm transition-colors">
@@ -116,8 +126,8 @@
 
                 <div class="space-y-3 mb-5">
                     <div class="flex justify-between text-sm">
-                        <span class="text-gray-400">Tạm tính ({{ $cartItems->count() }} sản phẩm)</span>
-                        <span class="text-white">{{ number_format($cartTotal, 0, ',', '.') }}₫</span>
+                        <span class="text-gray-400">Tạm tính (<span data-cart-page-count>{{ $cartItems->count() }}</span> sản phẩm)</span>
+                        <span data-cart-page-subtotal class="text-white">{{ number_format($cartTotal, 0, ',', '.') }}₫</span>
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-400">Giảm giá</span>
@@ -131,10 +141,10 @@
 
                 <div class="flex justify-between items-center border-t border-[#2a2a2a] pt-5 mb-6">
                     <span class="font-[Outfit] font-semibold text-white text-lg">Tổng Cộng</span>
-                    <span class="font-[Outfit] font-bold text-[#C5A572] text-2xl">{{ number_format($cartTotal, 0, ',', '.') }}₫</span>
+                    <span data-cart-page-total class="font-[Outfit] font-bold text-[#C5A572] text-2xl">{{ number_format($cartTotal, 0, ',', '.') }}₫</span>
                 </div>
 
-                <a href="{{ route('checkout.index') }}" class="btn-primary w-full py-4 text-sm mb-3 flex items-center justify-center gap-2">
+                <a href="{{ route('checkout.index') }}" data-cart-checkout-action class="btn-primary w-full py-4 text-sm mb-3 flex items-center justify-center gap-2 {{ $cartItems->isEmpty() ? 'opacity-50 pointer-events-none' : '' }}">
                     Tiến Hành Thanh Toán
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
@@ -157,10 +167,12 @@
 <script>
 function updateQty(cartItemId, quantity) {
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-    fetch(`/fashion-ecommerce-laravel/public/cart/update/${cartItemId}`, {
-        method: 'POST',
+    const updateUrl = `{{ url('/cart/update') }}/${cartItemId}`;
+
+    fetch(updateUrl, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
-        body: JSON.stringify({ _method: 'PATCH', quantity: parseInt(quantity) })
+        body: JSON.stringify({ quantity: parseInt(quantity) })
     }).then(r => r.json()).then(data => {
         if (data.success) window.location.reload();
     });

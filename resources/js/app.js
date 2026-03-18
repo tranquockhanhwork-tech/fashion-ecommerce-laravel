@@ -1,6 +1,7 @@
 import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
+    const appUrls = window.appConfig?.urls || {};
 
     /* ===== NAVBAR SCROLL ===== */
     const navbar = document.querySelector('.navbar');
@@ -63,6 +64,107 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     };
 
+    const setCartCount = (count = 0) => {
+        const next = Math.max(0, parseInt(count, 10) || 0);
+        document.querySelectorAll('[data-cart-count]').forEach((badge) => {
+            badge.textContent = next;
+            badge.style.display = next > 0 ? 'flex' : 'none';
+        });
+
+        document.querySelectorAll('[data-cart-sidebar-count]').forEach((label) => {
+            label.textContent = `(${next})`;
+        });
+
+        document.querySelectorAll('[data-cart-page-count]').forEach((label) => {
+            label.textContent = next;
+        });
+    };
+
+    const setCartTotals = (formattedTotal = '0₫') => {
+        document.querySelectorAll('[data-cart-sidebar-total]').forEach((node) => {
+            node.textContent = formattedTotal;
+        });
+
+        document.querySelectorAll('[data-cart-page-subtotal], [data-cart-page-total]').forEach((node) => {
+            node.textContent = formattedTotal;
+        });
+    };
+
+    const toggleCheckoutActions = (hasItems) => {
+        document.querySelectorAll('[data-cart-checkout-action]').forEach((link) => {
+            link.classList.toggle('opacity-50', !hasItems);
+            link.classList.toggle('pointer-events-none', !hasItems);
+        });
+    };
+
+    const renderCartEmptyState = (containerSelector, templateSelector) => {
+        const container = document.querySelector(containerSelector);
+        const template = document.querySelector(templateSelector);
+        if (!container || !template) return;
+
+        container.innerHTML = template.innerHTML;
+    };
+
+    const syncCartUiAfterRemove = (payload = {}) => {
+        const cartCount = parseInt(payload.cart_count || '0', 10) || 0;
+        const formattedTotal = payload.cart_total_formatted || '0₫';
+
+        setCartCount(cartCount);
+        setCartTotals(formattedTotal);
+        toggleCheckoutActions(cartCount > 0);
+
+        if (cartCount === 0) {
+            renderCartEmptyState('[data-cart-sidebar-items]', '#cart-sidebar-empty-template');
+            renderCartEmptyState('[data-cart-page-items]', '#cart-page-empty-template');
+        }
+    };
+
+    /* ===== REMOVE FROM CART ===== */
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-cart-remove]');
+        if (!btn) return;
+
+        e.preventDefault();
+
+        const itemId = btn.dataset.cartRemove;
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+        const removeBase = appUrls.cartRemoveBase || '/cart/remove';
+
+        if (!itemId || !csrf) {
+            showToast('Không thể xóa sản phẩm lúc này.', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        try {
+            const res = await fetch(`${removeBase}/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                showToast(data.message || 'Xóa sản phẩm thất bại.', 'error');
+                return;
+            }
+
+            document.querySelectorAll(`[data-cart-item="${itemId}"]`).forEach((node) => node.remove());
+            syncCartUiAfterRemove(data);
+            showToast(data.message || 'Đã xóa sản phẩm khỏi giỏ hàng');
+        } catch (error) {
+            showToast('Đã có lỗi xảy ra khi xóa sản phẩm.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    });
+
     /* ===== ADD TO CART ===== */
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-add-to-cart]');
@@ -92,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-        fetch('/fashion-ecommerce-laravel/public/cart/add', {
+        fetch(appUrls.cartAdd || '/cart/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -103,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(async res => {
             if (res.status === 302 || res.redirected) {
-                window.location.href = '/fashion-ecommerce-laravel/public/login';
+                window.location.href = appUrls.login || '/login';
                 return;
             }
             const data = await res.json();
@@ -131,17 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.color = isActive ? '#C5A572' : '';
         showToast(isActive ? 'Đã thêm vào yêu thích!' : 'Đã xóa khỏi yêu thích!');
     });
-
-    /* ===== CART COUNT ===== */
-    function updateCartCount(delta = 0) {
-        const badges = document.querySelectorAll('[data-cart-count]');
-        badges.forEach(badge => {
-            const current = parseInt(badge.textContent || '0');
-            const next = Math.max(0, current + delta);
-            badge.textContent = next;
-            badge.style.display = next > 0 ? 'flex' : 'none';
-        });
-    }
 
     /* ===== SIZE SELECTOR ===== */
     document.addEventListener('click', (e) => {

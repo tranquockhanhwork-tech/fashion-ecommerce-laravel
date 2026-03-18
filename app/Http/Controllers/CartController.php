@@ -107,9 +107,38 @@ class CartController extends Controller
             $item = $user->customer->cart->items()->find($id);
             if ($item) {
                 $item->delete();
+
+                $cart = $user->customer->cart()->with('items.variant.product')->first();
+                $cartItems = $cart?->items ?? collect();
+                $cartTotal = 0;
+
+                foreach ($cartItems as $cartItem) {
+                    $basePrice = $cartItem->variant->product->promotional_price ?: $cartItem->variant->product->price;
+                    $itemPrice = $cartItem->variant->price_override ?: $basePrice;
+                    $cartTotal += $itemPrice * $cartItem->quantity;
+                }
+
+                if (request()->expectsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Đã xóa sản phẩm khỏi giỏ hàng',
+                        'cart_count' => $cartItems->count(),
+                        'cart_total' => $cartTotal,
+                        'cart_total_formatted' => number_format($cartTotal, 0, ',', '.') . '₫',
+                    ]);
+                }
+
                 return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng');
             }
         }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy sản phẩm trong giỏ',
+            ], 404);
+        }
+
         return redirect()->back()->with('error', 'Không tìm thấy sản phẩm trong giỏ');
     }
 }
