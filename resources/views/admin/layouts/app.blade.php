@@ -15,6 +15,16 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
+    @if(request()->routeIs('admin.categories.edit', 'admin.categories.create'))
+    <style>
+        div:has(> label[for="sort_order"]),
+        div:has(> #sort_order),
+        label[for="sort_order"],
+        #sort_order {
+            display: none !important;
+        }
+    </style>
+    @endif
 </head>
 <body class="admin-mode bg-gray-100 font-[Inter] text-gray-800">
 
