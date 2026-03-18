@@ -25,6 +25,19 @@
         }
     </style>
     @endif
+    @if(request()->routeIs('admin.categories.index'))
+    <style>
+        table tbody tr {
+            cursor: pointer;
+        }
+
+        table thead th:nth-child(6),
+        table tbody td:nth-child(6),
+        table tbody td:last-child a[href*="/edit"] {
+            display: none !important;
+        }
+    </style>
+    @endif
 </head>
 <body class="admin-mode bg-gray-100 font-[Inter] text-gray-800">
 
@@ -173,6 +186,27 @@
         </div>
     </div>
 
+    @if(request()->routeIs('admin.categories.index'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('table tbody tr').forEach((row) => {
+                const editLink = row.querySelector('a[href*="/admin/categories/"][href$="/edit"]');
+
+                if (!editLink) {
+                    return;
+                }
+
+                row.addEventListener('click', (event) => {
+                    if (event.target.closest('form, button, a')) {
+                        return;
+                    }
+
+                    window.location.href = editLink.href;
+                });
+            });
+        });
+    </script>
+    @endif
     @stack('scripts')
 </body>
 </html>
