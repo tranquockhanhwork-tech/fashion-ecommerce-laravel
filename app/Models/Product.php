@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 
 class Product extends Model
 {
@@ -76,10 +77,30 @@ class Product extends Model
      */
     public function getThumbnailAttribute(): string
     {
-        $image = $this->primaryImage;
+        return $this->resolveThumbnailForColor();
+    }
 
-        if (! $image && $this->relationLoaded('images')) {
-            $image = $this->images->first();
+    public function resolveThumbnailForColor(?int $colorId = null): string
+    {
+        $images = $this->relationLoaded('images') ? $this->images : null;
+        $image = $colorId ? $this->resolveImageFromCollection($images, $colorId) : null;
+
+        if (! $image && $colorId) {
+            $image = $this->images()
+                ->where('color_id', $colorId)
+                ->first();
+        }
+
+        if (! $image) {
+            $image = $this->resolveImageFromCollection($images, null);
+        }
+
+        if (! $image) {
+            $image = $this->primaryImage;
+        }
+
+        if (! $image && $images instanceof Collection) {
+            $image = $images->first();
         }
 
         if (! $image) {
@@ -91,6 +112,17 @@ class Product extends Model
         }
 
         return $image->resolved_url;
+    }
+
+    protected function resolveImageFromCollection(?Collection $images, ?int $colorId): ?ProductImage
+    {
+        if (! $images instanceof Collection) {
+            return null;
+        }
+
+        return $images->first(function (ProductImage $image) use ($colorId) {
+            return (int) $image->color_id === (int) $colorId;
+        });
     }
 
     /**

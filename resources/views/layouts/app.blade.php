@@ -57,7 +57,7 @@
         $sidebarTotal = 0;
         if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
             $sidebarItems = Auth::user()->customer->cart->items()->with([
-                'variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+                'variant' => fn ($query) => $query->withOptionRelations()->with('product.images'),
             ])->get();
             foreach ($sidebarItems as $si) {
                 $basePrice    = $si->variant->product->promotional_price ?: $si->variant->product->price;
@@ -84,7 +84,7 @@
             @php
                 $basePrice = $si->variant->product->promotional_price ?: $si->variant->product->price;
                 $siPrice   = $si->variant->price_override ?: $basePrice;
-                $siImg     = $si->variant->product->thumbnail;
+                $siImg     = $si->variant->product->resolveThumbnailForColor($si->variant->color_id);
                 $siProdId  = $si->variant->product_id;
             @endphp
             <div class="flex gap-4 border-b border-[#1a1a1a] pb-4 last:border-0 last:pb-0" data-cart-item="{{ $si->id }}">
@@ -129,10 +129,6 @@
             <div class="flex justify-between text-sm mb-2">
                 <span class="text-gray-400">Tạm tính</span>
                 <span data-cart-sidebar-total class="font-semibold text-white">{{ number_format($sidebarTotal, 0, ',', '.') }}₫</span>
-            </div>
-            <div class="flex justify-between text-sm mb-5">
-                <span class="text-gray-400">Phí ship</span>
-                <span class="text-[#C5A572] text-xs">Miễn phí từ 1.000.000₫</span>
             </div>
             <a href="{{ route('cart.index') }}" class="btn-primary w-full mb-3 text-center py-3 text-sm">Xem Giỏ Hàng</a>
             <a href="{{ route('checkout.index') }}" data-cart-checkout-action class="btn-outline w-full text-center py-3 text-sm {{ $sidebarItems->isEmpty() ? 'opacity-50 pointer-events-none' : '' }}">Thanh Toán Ngay</a>
