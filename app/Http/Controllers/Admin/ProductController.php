@@ -86,7 +86,7 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with(['variants' => fn ($query) => $query->orderBy('color')->orderBy('size')])->findOrFail($id);
         $categories = Category::all();
         return view('admin.products.edit', compact('product', 'categories'));
     }
@@ -104,6 +104,8 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'promotional_price' => 'nullable|numeric|min:0|lt:price',
             'description' => 'nullable|string',
+            'restock_quantities' => 'nullable|array',
+            'restock_quantities.*' => 'nullable|integer|min:0',
         ];
 
         if ($this->hasActualUploadedFile('image_url')) {
@@ -119,6 +121,24 @@ class ProductController extends Controller
         $data['is_active'] = $request->has('is_active');
 
         $product->update($data);
+
+        $restockQuantities = collect($request->input('restock_quantities', []))
+            ->mapWithKeys(fn ($quantity, $variantId) => [(int) $variantId => max(0, (int) $quantity)])
+            ->filter(fn ($quantity) => $quantity > 0);
+
+        if ($restockQuantities->isNotEmpty()) {
+            $product->loadMissing('variants');
+
+            foreach ($product->variants as $variant) {
+                $restockQuantity = (int) $restockQuantities->get($variant->id, 0);
+
+                if ($restockQuantity <= 0) {
+                    continue;
+                }
+
+                $variant->increment('stock_quantity', $restockQuantity);
+            }
+        }
 
         $uploadedImage = $this->resolveUploadedImage($request);
         if ($uploadedImage instanceof UploadedFile) {

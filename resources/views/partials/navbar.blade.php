@@ -15,8 +15,6 @@
             <div class="hidden lg:flex items-center gap-8">
                 <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Trang Chủ</a>
                 <a href="{{ route('shop.index') }}" class="nav-link {{ request()->routeIs('shop.*') ? 'active' : '' }}">Shop</a>
-                <a href="{{ route('shop.index') }}?category=men" class="nav-link">Nam</a>
-                <a href="{{ route('shop.index') }}?category=women" class="nav-link">Nữ</a>
                 <a href="{{ route('about') }}" class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}">Về Chúng Tôi</a>
                 <a href="{{ route('contact') }}" class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Liên Hệ</a>
             </div>
@@ -106,8 +104,6 @@
     <div class="flex flex-col p-6 gap-1">
         <a href="{{ route('home') }}" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] border-b border-[#1a1a1a] transition-colors font-[Outfit]">Trang Chủ</a>
         <a href="{{ route('shop.index') }}" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] border-b border-[#1a1a1a] transition-colors font-[Outfit]">Shop</a>
-        <a href="{{ route('shop.index') }}?category=men" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] border-b border-[#1a1a1a] transition-colors font-[Outfit]">Nam</a>
-        <a href="{{ route('shop.index') }}?category=women" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] border-b border-[#1a1a1a] transition-colors font-[Outfit]">Nữ</a>
         <a href="{{ route('about') }}" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] border-b border-[#1a1a1a] transition-colors font-[Outfit]">Về Chúng Tôi</a>
         <a href="{{ route('contact') }}" class="py-3 text-lg font-medium text-gray-300 hover:text-[#C5A572] transition-colors font-[Outfit]">Liên Hệ</a>
     </div>

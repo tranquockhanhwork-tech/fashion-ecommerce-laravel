@@ -2,6 +2,70 @@ import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
     const appUrls = window.appConfig?.urls || {};
+    const themeStorageKey = 'color-theme';
+    const root = document.documentElement;
+
+    const getPreferredTheme = () => {
+        const savedTheme = localStorage.getItem(themeStorageKey);
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+            return savedTheme;
+        }
+
+        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    };
+
+    const applyTheme = (theme) => {
+        const nextTheme = theme === 'light' ? 'light' : 'dark';
+        root.classList.toggle('light-mode', nextTheme === 'light');
+        root.dataset.theme = nextTheme;
+    };
+
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const mobileThemeIcon = document.getElementById('mobile-theme-icon');
+    const mobileThemeText = document.getElementById('mobile-theme-text');
+    const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
+
+    const syncThemeToggleUi = () => {
+        const isLightMode = root.classList.contains('light-mode');
+        const nextThemeLabel = isLightMode ? 'giao diện tối' : 'giao diện sáng';
+
+        themeToggleLightIcon?.classList.toggle('hidden', isLightMode);
+        themeToggleDarkIcon?.classList.toggle('hidden', !isLightMode);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.title = `Chuyển sang ${nextThemeLabel}`;
+            themeToggleBtn.setAttribute('aria-label', `Chuyển sang ${nextThemeLabel}`);
+        }
+
+        if (mobileThemeBtn) {
+            mobileThemeBtn.setAttribute('aria-label', `Chuyển sang ${nextThemeLabel}`);
+        }
+
+        if (mobileThemeText) {
+            mobileThemeText.textContent = isLightMode ? 'Chế độ Tối' : 'Chế độ Sáng';
+        }
+
+        if (mobileThemeIcon) {
+            mobileThemeIcon.innerHTML = isLightMode
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+        }
+    };
+
+    const toggleTheme = () => {
+        const nextTheme = root.classList.contains('light-mode') ? 'dark' : 'light';
+        localStorage.setItem(themeStorageKey, nextTheme);
+        applyTheme(nextTheme);
+        syncThemeToggleUi();
+    };
+
+    applyTheme(getPreferredTheme());
+    syncThemeToggleUi();
+
+    themeToggleBtn?.addEventListener('click', toggleTheme);
+    mobileThemeBtn?.addEventListener('click', toggleTheme);
 
     /* ===== NAVBAR SCROLL ===== */
     const navbar = document.querySelector('.navbar');

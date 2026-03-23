@@ -374,6 +374,78 @@
     pointer-events: none;
 }
 
+.light-mode .shop-page {
+    background:
+        radial-gradient(760px 280px at 0% 0%, rgba(197, 165, 114, 0.10), transparent 60%),
+        radial-gradient(640px 260px at 100% 4%, rgba(197, 165, 114, 0.08), transparent 58%),
+        linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+}
+
+.light-mode .shop-hero {
+    background: linear-gradient(180deg, #fff4df 0%, #ffffff 76%);
+    border-color: rgba(197, 165, 114, 0.24);
+}
+
+.light-mode .shop-hero::after {
+    background: linear-gradient(90deg, rgba(197, 165, 114, 0.12), rgba(197, 165, 114, 0.03) 45%, transparent 72%);
+}
+
+.light-mode .shop-hero-stat {
+    border-color: rgba(197, 165, 114, 0.30);
+    background: linear-gradient(145deg, #fffaf0, #f7e9c9);
+    box-shadow: 0 18px 34px rgba(197, 165, 114, 0.14);
+}
+
+.light-mode .shop-filter-shell {
+    border-color: rgba(197, 165, 114, 0.22);
+    background: linear-gradient(180deg, #ffffff 0%, #fff8ee 100%);
+    box-shadow: 0 20px 42px rgba(145, 112, 63, 0.10);
+}
+
+.light-mode .shop-toolbar {
+    border-color: rgba(197, 165, 114, 0.18);
+    background: linear-gradient(180deg, #ffffff 0%, #fffaf2 100%);
+    box-shadow: 0 14px 30px rgba(145, 112, 63, 0.08);
+}
+
+.light-mode .shop-page #product-grid:not(.list-view) .product-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fff9ef 100%);
+    border-color: rgba(197, 165, 114, 0.18);
+    box-shadow: 0 12px 24px rgba(145, 112, 63, 0.08);
+}
+
+.light-mode .shop-page #product-grid:not(.list-view) .product-card:hover {
+    border-color: rgba(197, 165, 114, 0.60);
+    box-shadow: 0 22px 38px rgba(197, 165, 114, 0.18);
+}
+
+.light-mode .shop-page #product-grid:not(.list-view) .product-card-image {
+    background: #f8efdf;
+}
+
+.light-mode #product-grid.list-view .product-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fffaf2 100%);
+    border-color: rgba(197, 165, 114, 0.18);
+    box-shadow: 0 16px 28px rgba(145, 112, 63, 0.08);
+}
+
+.light-mode .filter-option-btn.filter-option-active {
+    background: rgba(197, 165, 114, 0.10);
+}
+
+.light-mode .filter-chip:hover {
+    background: rgba(197, 165, 114, 0.10);
+}
+
+.light-mode .filter-chip-active {
+    color: #2f2417 !important;
+    box-shadow: 0 0 0 1px rgba(197, 165, 114, 0.18), 0 10px 22px rgba(197, 165, 114, 0.14);
+}
+
+.light-mode .filter-chip.filter-chip-active:hover {
+    color: #2f2417 !important;
+}
+
 /* CSS cho hiển thị list ngang */
 #product-grid.list-view {
     display: flex;

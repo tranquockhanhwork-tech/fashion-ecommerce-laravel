@@ -35,15 +35,18 @@
     @stack('styles')
     
     <script>
-        // Set light/dark mode based on local storage
-        if (localStorage.getItem('color-theme') === 'light' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-            document.documentElement.classList.add('light-mode');
-        } else {
-            document.documentElement.classList.remove('light-mode');
-        }
+        (() => {
+            const storageKey = 'color-theme';
+            const savedTheme = localStorage.getItem(storageKey);
+            const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+            const theme = savedTheme === 'light' || (!savedTheme && prefersLight) ? 'light' : 'dark';
+
+            document.documentElement.classList.toggle('light-mode', theme === 'light');
+            document.documentElement.dataset.theme = theme;
+        })();
     </script>
 </head>
-<body class="bg-[#0A0A0A] text-[#F5F5F0]">
+<body class="bg-[#0A0A0A] text-[#F5F5F0] customer-mode">
 
     {{-- Navbar --}}
     @include('partials.navbar')
@@ -162,44 +165,6 @@
     @stack('scripts')
 
     <script>
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-        const themeToggleBtn = document.getElementById('theme-toggle');
-
-        const mobileThemeIcon = document.getElementById('mobile-theme-icon');
-        const mobileThemeText = document.getElementById('mobile-theme-text');
-        const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
-
-        function updateThemeIcons() {
-            if (document.documentElement.classList.contains('light-mode')) {
-                themeToggleLightIcon?.classList.add('hidden'); // Sun hidden
-                themeToggleDarkIcon?.classList.remove('hidden'); // Moon shown
-                if(mobileThemeText) mobileThemeText.textContent = "Chế độ Tối";
-                if(mobileThemeIcon) mobileThemeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
-            } else {
-                themeToggleDarkIcon?.classList.add('hidden'); // Moon hidden
-                themeToggleLightIcon?.classList.remove('hidden'); // Sun shown
-                if(mobileThemeText) mobileThemeText.textContent = "Chế độ Sáng";
-                if(mobileThemeIcon) mobileThemeIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
-            }
-        }
-
-        updateThemeIcons();
-
-        function toggleTheme() {
-            if (document.documentElement.classList.contains('light-mode')) {
-                document.documentElement.classList.remove('light-mode');
-                localStorage.setItem('color-theme', 'dark');
-            } else {
-                document.documentElement.classList.add('light-mode');
-                localStorage.setItem('color-theme', 'light');
-            }
-            updateThemeIcons();
-        }
-
-        themeToggleBtn?.addEventListener('click', toggleTheme);
-        mobileThemeBtn?.addEventListener('click', toggleTheme);
-
         // Xử lý Thêm / Xoá Yêu Thích 
         document.addEventListener('click', async function(e) {
             const btn = e.target.closest('.action-wishlist');

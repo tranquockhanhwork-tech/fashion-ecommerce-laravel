@@ -15,6 +15,38 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
+    <style>
+        .admin-sidebar-brand-accent {
+            color: #f6dfb0 !important;
+        }
+
+        .admin-sidebar-badge {
+            color: #f0d49a !important;
+        }
+
+        .admin-sidebar-link {
+            color: #f2e7d2 !important;
+        }
+
+        .admin-sidebar-link:hover {
+            color: #fff8ec !important;
+            background-color: #1f2937;
+        }
+
+        .admin-sidebar-link.is-active {
+            color: #ffffff !important;
+            background-color: #1f2937;
+            border-right: 4px solid #f0d49a;
+        }
+
+        .admin-sidebar-footer-link {
+            color: #e6d5b4 !important;
+        }
+
+        .admin-sidebar-footer-link:hover {
+            color: #fff8ec !important;
+        }
+    </style>
     @if(request()->routeIs('admin.categories.edit', 'admin.categories.create'))
     <style>
         div:has(> label[for="sort_order"]),
@@ -46,15 +78,15 @@
         <aside class="w-64 bg-gray-900 border-r border-gray-800 hidden md:flex flex-col flex-shrink-0">
             <div class="h-16 flex items-center justify-center border-b border-gray-800 px-4">
                 <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-gray-950 px-4 py-2 font-bold text-xl tracking-wider shadow-sm">
-                    <span style="color: #f8fafc;">COOL</span><span class="text-[#C5A572]">WEAR</span>
-                    <span class="rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em] text-gray-300">ADMIN</span>
+                    <span style="color: #f8fafc;">COOL</span><span class="admin-sidebar-brand-accent">WEAR</span>
+                    <span class="admin-sidebar-badge rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-semibold tracking-[0.2em]">ADMIN</span>
                 </a>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-4">
                 <ul class="space-y-1">
                     <li>
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.dashboard') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
@@ -62,7 +94,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.products.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.products.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.products.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
@@ -70,7 +102,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.categories.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h5l2 2h11v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
                             </svg>
@@ -78,7 +110,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.orders.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.orders.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
@@ -86,7 +118,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.customers.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.customers.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.customers.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.customers.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
@@ -94,7 +126,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.reviews.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.reviews.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.reviews.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.reviews.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.052 3.236a1 1 0 00.95.69h3.403c.969 0 1.371 1.24.588 1.81l-2.753 2a1 1 0 00-.364 1.118l1.052 3.237c.3.92-.755 1.688-1.538 1.118l-2.752-2a1 1 0 00-1.176 0l-2.752 2c-.784.57-1.838-.197-1.539-1.118l1.053-3.237a1 1 0 00-.364-1.118l-2.753-2c-.783-.57-.38-1.81.588-1.81h3.403a1 1 0 00.951-.69l1.051-3.236z"/>
                             </svg>
@@ -102,7 +134,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.coupons.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.coupons.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.coupons.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.coupons.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7.5-3a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm-5.5 2h7"/>
                             </svg>
@@ -111,7 +143,7 @@
                     </li>
                     @if(auth()->user()->role === 'admin')
                     <li>
-                        <a href="{{ route('admin.employees.index') }}" class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors {{ request()->routeIs('admin.employees.*') ? 'bg-gray-800 text-white border-r-4 border-[#C5A572]' : '' }}">
+                        <a href="{{ route('admin.employees.index') }}" class="admin-sidebar-link flex items-center gap-3 px-6 py-3 font-medium transition-colors {{ request()->routeIs('admin.employees.*') ? 'is-active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5V4H2v16h5m10 0v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2m12 0H7m10-12a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
@@ -123,7 +155,7 @@
             </nav>
 
             <div class="p-4 border-t border-gray-800">
-                <a href="{{ route('home') }}" target="_blank" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+                <a href="{{ route('home') }}" target="_blank" class="admin-sidebar-footer-link flex items-center gap-3 px-4 py-2 text-sm font-medium transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                     </svg>

@@ -53,15 +53,19 @@
                 <div class="relative">
                     {{-- Main product card mock --}}
                     <div class="w-full aspect-[4/5] bg-[#111] border border-[#1a1a1a] overflow-hidden relative group">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" alt="Hero Fashion" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img src="{{ $heroLookProduct?->thumbnail ?? 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80' }}" alt="{{ $heroLookProduct?->name ?? 'Hero Fashion' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                         <div class="absolute bottom-6 left-6 right-6">
                             <div class="bg-[#111]/80 backdrop-blur-sm border border-[#2a2a2a] p-4">
                                 <div class="text-xs text-[#C5A572] uppercase tracking-widest mb-1">Bestseller</div>
-                                <div class="font-[Outfit] font-semibold text-white text-lg">Premium Streetwear Set</div>
+                                <div class="font-[Outfit] font-semibold text-white text-lg">{{ $heroLookProduct?->name ?? 'Premium Streetwear Set' }}</div>
                                 <div class="flex items-center justify-between mt-2">
-                                    <span class="text-[#C5A572] font-bold text-xl">1.290.000₫</span>
-                                    <button class="btn-primary py-2 px-4 text-xs" data-add-to-cart data-product-name="Premium Streetwear Set">Thêm Vào Giỏ</button>
+                                    <span class="text-[#C5A572] font-bold text-xl">{{ $heroLookProduct?->formatted_price ?? '1.290.000₫' }}</span>
+                                    @if($heroLookProduct)
+                                    <a href="{{ route('shop.show', $heroLookProduct->id) }}" class="btn-primary py-2 px-4 text-xs">Xem Chi Tiết</a>
+                                    @else
+                                    <button class="btn-primary py-2 px-4 text-xs" type="button">Sắp Có</button>
+                                    @endif
                                 </div>
                             </div>
                         </div>

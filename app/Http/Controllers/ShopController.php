@@ -58,8 +58,12 @@ class ShopController extends Controller
             default      => $query->orderByDesc('id'),
         };
 
-        $products   = $query->paginate(12)->withQueryString();
-        $categories = Category::whereNull('parent_id')->with('children')->orderBy('sort_order')->get();
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Category::query()
+            ->whereNull('parent_id')
+            ->with(['children' => fn ($query) => $query->orderBy('name')])
+            ->orderBy('name')
+            ->get();
         
         $availableSizes = \App\Models\ProductVariant::whereHas('product', fn($q) => $q->where('is_active', true))->distinct()->pluck('size')->filter()->values();
         $availableColors = \App\Models\ProductVariant::whereHas('product', fn($q) => $q->where('is_active', true))->distinct()->pluck('color')->filter()->values();
