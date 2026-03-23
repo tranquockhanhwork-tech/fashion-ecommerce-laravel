@@ -137,7 +137,9 @@ class CheckoutStockTest extends TestCase
             'is_active' => true,
         ]);
 
-        $size = Size::query()->create([
+        $size = Size::query()->firstOrCreate([
+            'name' => 'M',
+        ], [
             'name' => 'M',
             'sort_order' => 30,
         ]);

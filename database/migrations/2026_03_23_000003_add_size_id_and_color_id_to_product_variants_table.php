@@ -102,7 +102,9 @@ return new class extends Migration
             'M' => 30,
             'L' => 40,
             'XL' => 50,
+            '2XL' => 60,
             'XXL' => 60,
+            '3XL' => 70,
             'XXXL' => 70,
         ];
 

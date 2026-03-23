@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\Size;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ShopController extends Controller
@@ -99,7 +100,7 @@ class ShopController extends Controller
         $product = Product::where('is_active', true)
             ->with([
                 'category',
-                'images',
+                'images' => fn ($query) => $query->with('colorOption'),
                 'variants' => fn ($query) => $query->withOptionRelations(),
                 'reviews.customer',
             ])
@@ -158,6 +159,37 @@ class ShopController extends Controller
             ->unique()
             ->values();
 
+        $genericGalleryImages = $product->images
+            ->whereNull('color_id')
+            ->values();
+
+        $galleryDefault = $this->buildGalleryPayload(
+            $product,
+            $genericGalleryImages->isNotEmpty() ? $genericGalleryImages : $product->images
+        );
+
+        $galleryByColor = $colors
+            ->mapWithKeys(function (string $colorName) use ($product, $genericGalleryImages, $galleryDefault) {
+                $specificImages = $product->images
+                    ->filter(fn ($image) => $image->colorOption?->name === $colorName)
+                    ->values();
+
+                $galleryImages = $specificImages->isNotEmpty()
+                    ? $specificImages->concat(
+                        $genericGalleryImages->reject(
+                            fn ($image) => $specificImages->contains('id', $image->id)
+                        )
+                    )->values()
+                    : $genericGalleryImages;
+
+                if ($galleryImages->isEmpty()) {
+                    return [$colorName => $galleryDefault];
+                }
+
+                return [$colorName => $this->buildGalleryPayload($product, $galleryImages)];
+            })
+            ->all();
+
         // Sản phẩm liên quan (cùng danh mục, loại trừ SP hiện tại)
         $relatedProducts = Product::where('is_active', true)
             ->where('category_id', $product->category_id)
@@ -172,6 +204,40 @@ class ShopController extends Controller
                 ->pluck('product_id')->toArray();
         }
 
-        return view('pages.product-detail', compact('product', 'sizes', 'colors', 'variantsData', 'relatedProducts', 'wishlistIds'));
+        return view('pages.product-detail', compact(
+            'product',
+            'sizes',
+            'colors',
+            'variantsData',
+            'galleryDefault',
+            'galleryByColor',
+            'relatedProducts',
+            'wishlistIds'
+        ));
+    }
+
+    protected function buildGalleryPayload(Product $product, Collection $images): array
+    {
+        $gallery = $images
+            ->filter(fn ($image) => trim((string) $image->image_url) !== '')
+            ->map(fn ($image) => [
+                'id' => $image->id,
+                'src' => $image->resolved_url,
+                'alt' => trim((string) $image->alt_text) !== ''
+                    ? $image->alt_text
+                    : $product->name,
+            ])
+            ->values()
+            ->all();
+
+        if ($gallery !== []) {
+            return $gallery;
+        }
+
+        return [[
+            'id' => 0,
+            'src' => $product->thumbnail,
+            'alt' => $product->name,
+        ]];
     }
 }

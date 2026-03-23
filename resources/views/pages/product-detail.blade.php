@@ -4,7 +4,10 @@
 @section('meta_description', Str::limit(strip_tags($product->description), 160))
 
 @section('content')
-@php $totalStock = $product->variants->sum('stock_quantity'); @endphp
+@php
+    $totalStock = $product->variants->sum('stock_quantity');
+    $initialGalleryImage = $galleryDefault[0] ?? ['src' => $product->thumbnail, 'alt' => $product->name];
+@endphp
 <div class="min-h-screen bg-[#0A0A0A]">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
@@ -26,18 +29,23 @@
         {{-- Image Gallery --}}
         <div class="flex gap-4">
             {{-- Thumbnails --}}
-            <div class="flex flex-col gap-3">
-                @forelse($product->images as $img)
-                <img data-gallery-thumb src="{{ $img->image_url }}" alt="{{ $img->alt_text ?? $product->name }}"
-                     class="w-16 h-20 object-cover border-2 border-[#2a2a2a] cursor-pointer hover:border-[#C5A572] transition-colors">
-                @empty
-                <img data-gallery-thumb src="{{ $product->thumbnail }}" alt="{{ $product->name }}"
-                     class="w-16 h-20 object-cover border-2 border-[#C5A572] cursor-pointer">
-                @endforelse
+            <div class="flex flex-col gap-3" data-gallery-thumbs>
+                @foreach($galleryDefault as $image)
+                <button
+                    type="button"
+                    data-gallery-thumb
+                    data-gallery-src="{{ $image['src'] }}"
+                    data-gallery-alt="{{ $image['alt'] }}"
+                    class="w-16 h-20 overflow-hidden border-2 cursor-pointer transition-colors {{ $loop->first ? 'border-[#C5A572]' : 'border-[#2a2a2a]' }}"
+                    style="border-color: {{ $loop->first ? '#C5A572' : '#2a2a2a' }};"
+                >
+                    <img src="{{ $image['src'] }}" alt="{{ $image['alt'] }}" class="w-full h-full object-cover">
+                </button>
+                @endforeach
             </div>
             {{-- Ảnh chính --}}
             <div class="flex-1 aspect-[4/5] bg-[#111] overflow-hidden">
-                <img data-gallery-main src="{{ $product->thumbnail }}" alt="{{ $product->name }}"
+                <img data-gallery-main src="{{ $initialGalleryImage['src'] }}" alt="{{ $initialGalleryImage['alt'] }}"
                      class="w-full h-full object-cover transition-opacity duration-300">
             </div>
         </div>
@@ -46,6 +54,8 @@
         <div
             data-product-detail
             data-variants='@json($variantsData)'
+            data-gallery-default='@json($galleryDefault)'
+            data-gallery-by-color='@json($galleryByColor)'
             data-total-stock="{{ $totalStock }}"
         >
             <div class="flex items-center gap-3 mb-3">

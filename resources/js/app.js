@@ -358,15 +358,38 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
     /* ===== PRODUCT IMAGE GALLERY ===== */
-    document.querySelectorAll('[data-gallery-thumb]').forEach(thumb => {
-        thumb.addEventListener('click', () => {
-            const mainImg = document.querySelector('[data-gallery-main]');
-            if (mainImg) mainImg.src = thumb.src;
-            document.querySelectorAll('[data-gallery-thumb]').forEach(t => {
-                t.style.borderColor = t === thumb ? '#C5A572' : '#2a2a2a';
+    const bindGalleryThumbs = (scope = document) => {
+        scope.querySelectorAll('[data-gallery-thumb]').forEach((thumb) => {
+            if (thumb.dataset.galleryBound === 'true') {
+                return;
+            }
+
+            thumb.dataset.galleryBound = 'true';
+            thumb.addEventListener('click', () => {
+                const mainImg = document.querySelector('[data-gallery-main]');
+
+                if (mainImg) {
+                    mainImg.src = thumb.dataset.gallerySrc || thumb.getAttribute('src') || mainImg.src;
+                    mainImg.alt = thumb.dataset.galleryAlt || thumb.getAttribute('alt') || mainImg.alt;
+                }
+
+                const thumbGroup = thumb.parentElement;
+                thumbGroup?.querySelectorAll('[data-gallery-thumb]').forEach((node) => {
+                    node.style.borderColor = node === thumb ? '#C5A572' : '#2a2a2a';
+                });
             });
         });
-    });
+    };
+
+    const parseJsonDataset = (rawValue, fallback) => {
+        try {
+            return JSON.parse(rawValue || JSON.stringify(fallback));
+        } catch (error) {
+            return fallback;
+        }
+    };
+
+    bindGalleryThumbs();
 
     /* ===== PRODUCT VARIANT SELECTOR ===== */
     const productDetail = document.querySelector('[data-product-detail]');
@@ -380,6 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const totalStock = parseInt(productDetail.dataset.totalStock || '0', 10);
+        const galleryDefault = parseJsonDataset(productDetail.dataset.galleryDefault, []);
+        const galleryByColor = parseJsonDataset(productDetail.dataset.galleryByColor, {});
         const colorButtons = Array.from(productDetail.querySelectorAll('[data-variant-color]'));
         const sizeButtons = Array.from(productDetail.querySelectorAll('[data-variant-size]'));
         const selectedColorLabel = productDetail.querySelector('#selected-color');
@@ -390,9 +415,73 @@ document.addEventListener('DOMContentLoaded', () => {
         const variantInput = purchaseBox?.querySelector('[data-selected-variant-id]');
         const addToCartBtn = purchaseBox?.querySelector('[data-add-to-cart]');
         const buyNowBtn = productDetail.querySelector('[data-buy-now]');
+        const galleryThumbs = document.querySelector('[data-gallery-thumbs]');
+        const galleryMain = document.querySelector('[data-gallery-main]');
 
         let selectedColor = null;
         let selectedSize = null;
+        let activeGalleryKey = '__default__';
+
+        const renderGallery = (images) => {
+            if (!galleryThumbs || !galleryMain) {
+                return;
+            }
+
+            const nextImages = Array.isArray(images) && images.length > 0
+                ? images
+                : galleryDefault;
+
+            if (!Array.isArray(nextImages) || nextImages.length < 1) {
+                return;
+            }
+
+            galleryThumbs.innerHTML = '';
+
+            nextImages.forEach((image, index) => {
+                if (!image?.src) {
+                    return;
+                }
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.dataset.galleryThumb = 'true';
+                button.dataset.gallerySrc = image.src;
+                button.dataset.galleryAlt = image.alt || '';
+                button.className = 'w-16 h-20 overflow-hidden border-2 cursor-pointer transition-colors';
+                button.style.borderColor = index === 0 ? '#C5A572' : '#2a2a2a';
+
+                const thumbImage = document.createElement('img');
+                thumbImage.src = image.src;
+                thumbImage.alt = image.alt || '';
+                thumbImage.className = 'w-full h-full object-cover';
+
+                button.appendChild(thumbImage);
+                galleryThumbs.appendChild(button);
+            });
+
+            const firstImage = nextImages.find((image) => image?.src) || null;
+
+            if (firstImage) {
+                galleryMain.src = firstImage.src;
+                galleryMain.alt = firstImage.alt || galleryMain.alt;
+            }
+
+            bindGalleryThumbs(galleryThumbs);
+        };
+
+        const syncGalleryWithColor = () => {
+            const hasSpecificGallery = selectedColor
+                && Array.isArray(galleryByColor[selectedColor])
+                && galleryByColor[selectedColor].length > 0;
+            const galleryKey = hasSpecificGallery ? selectedColor : '__default__';
+
+            if (galleryKey === activeGalleryKey) {
+                return;
+            }
+
+            renderGallery(hasSpecificGallery ? galleryByColor[selectedColor] : galleryDefault);
+            activeGalleryKey = galleryKey;
+        };
 
         const hasAvailableVariant = ({ color = null, size = null } = {}) => {
             return variants.some((variant) => {
@@ -478,6 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             setPurchaseState(Boolean(selectedVariant && selectedVariant.stock_quantity > 0));
+            syncGalleryWithColor();
         };
 
         colorButtons.forEach((button) => {

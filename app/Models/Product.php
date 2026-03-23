@@ -34,7 +34,10 @@ class Product extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(ProductImage::class)
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     public function primaryImage(): HasOne
@@ -73,17 +76,21 @@ class Product extends Model
      */
     public function getThumbnailAttribute(): string
     {
-        $imageUrl = $this->primaryImage?->image_url;
+        $image = $this->primaryImage;
 
-        if (! $imageUrl) {
+        if (! $image && $this->relationLoaded('images')) {
+            $image = $this->images->first();
+        }
+
+        if (! $image) {
+            $image = $this->images()->first();
+        }
+
+        if (! $image) {
             return 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80';
         }
 
-        if (str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://')) {
-            return $imageUrl;
-        }
-
-        return asset('storage/' . ltrim($imageUrl, '/'));
+        return $image->resolved_url;
     }
 
     /**
