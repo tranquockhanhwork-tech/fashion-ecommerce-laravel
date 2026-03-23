@@ -114,7 +114,7 @@
         <div class="flex items-end justify-between mb-10">
             <div>
                 <div class="section-label">Danh Mục</div>
-                <h2 class="section-title">Khám Phá<br>Phong Cách Của Bạn</h2>
+                <h2 class="section-title">Khám Phá<br>Gu Mặc Nam</h2>
             </div>
             <a href="{{ route('shop.index') }}" class="hidden md:flex items-center gap-2 text-sm text-[#C5A572] hover:gap-3 transition-all uppercase tracking-wider font-semibold">
                 Xem Tất Cả
@@ -141,13 +141,13 @@
                 </div>
             </a>
 
-            {{-- Women --}}
-            <a href="{{ route('shop.index') }}?category=women" class="category-card group">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Thời Trang Nữ" loading="lazy">
+            {{-- Smart Casual --}}
+            <a href="{{ route('shop.index', ['search' => 'Polo']) }}" class="category-card group">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Polo & Casual" loading="lazy">
                 <div class="category-card-overlay"></div>
                 <div class="category-card-content">
                     <div class="text-[#C5A572] text-xs uppercase tracking-widest mb-2">Bộ Sưu Tập</div>
-                    <h3 class="font-[Outfit] font-bold text-2xl text-white mb-3">Thời Trang Nữ</h3>
+                    <h3 class="font-[Outfit] font-bold text-2xl text-white mb-3">Polo & Casual</h3>
                     <div class="flex items-center gap-2 text-white/70 text-sm group-hover:text-[#C5A572] transition-colors">
                         Khám phá
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

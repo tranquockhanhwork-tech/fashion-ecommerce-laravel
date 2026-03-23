@@ -33,7 +33,7 @@
                 <ul class="space-y-3">
                     <li><a href="{{ route('shop.index') }}" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Tất Cả Sản Phẩm</a></li>
                     <li><a href="{{ route('shop.index') }}?category=men" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Thời Trang Nam</a></li>
-                    <li><a href="{{ route('shop.index') }}?category=women" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Thời Trang Nữ</a></li>
+                    <li><a href="{{ route('shop.index', ['search' => 'Polo']) }}" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Polo & Casual</a></li>
                     <li><a href="{{ route('shop.index') }}?sale=1" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Giảm Giá</a></li>
                     <li><a href="{{ route('shop.index') }}?new=1" class="text-gray-500 text-sm hover:text-[#C5A572] transition-colors">Hàng Mới</a></li>
                 </ul>
