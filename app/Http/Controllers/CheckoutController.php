@@ -19,7 +19,9 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
         if ($user && $user->customer && $user->customer->cart) {
-            $cartItems = $user->customer->cart->items()->with(['variant.product'])->get();
+            $cartItems = $user->customer->cart->items()->with([
+                'variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+            ])->get();
             foreach ($cartItems as $ci) {
                 $basePrice = $ci->variant->product->promotional_price ?: $ci->variant->product->price;
                 $itemPrice = $ci->variant->price_override ?: $basePrice;
@@ -89,6 +91,7 @@ class CheckoutController extends Controller
 
                 $variantIds = $cartItems->pluck('product_variant_id')->unique()->values();
                 $variants = ProductVariant::with('product')
+                    ->withOptionRelations()
                     ->whereIn('id', $variantIds)
                     ->lockForUpdate()
                     ->get()
@@ -165,7 +168,9 @@ class CheckoutController extends Controller
 
     public function success(int $order, VietQrService $vietQrService): \Illuminate\View\View
     {
-        $order = Order::with('items.variant.product')->findOrFail($order);
+        $order = Order::with([
+            'items.variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+        ])->findOrFail($order);
         if (Auth::user()->customer?->id !== $order->customer_id) {
             abort(403);
         }

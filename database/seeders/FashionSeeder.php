@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Concerns\ResolvesVariantOptions;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class FashionSeeder extends Seeder
 {
+    use ResolvesVariantOptions;
+
     /**
      * Run the database seeds.
      */
@@ -65,7 +68,7 @@ class FashionSeeder extends Seeder
         DB::table('products')->insert($products);
 
         // 6. Product Variants (Biến thể)
-        $variants = [
+        $variants = $this->prepareVariantPayloads([
             ['id' => 1, 'product_id' => 1, 'sku' => 'AOT-BASIC-TRANG-M', 'size' => 'M', 'color' => 'Trắng', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
             ['id' => 2, 'product_id' => 1, 'sku' => 'AOT-BASIC-TRANG-L', 'size' => 'L', 'color' => 'Trắng', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
             ['id' => 3, 'product_id' => 1, 'sku' => 'AOT-BASIC-DEN-M', 'size' => 'M', 'color' => 'Đen', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
@@ -73,7 +76,7 @@ class FashionSeeder extends Seeder
             ['id' => 5, 'product_id' => 3, 'sku' => 'QJN-SUONG-L', 'size' => 'L', 'color' => 'Xanh Nhạt', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
             ['id' => 6, 'product_id' => 4, 'sku' => 'VAY-LUA-DO-S', 'size' => 'S', 'color' => 'Đỏ Đô', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
             ['id' => 7, 'product_id' => 10, 'sku' => 'VAY-CHU-A-DEN-M', 'size' => 'M', 'color' => 'Đen', 'stock_quantity' => 999, 'created_at' => $now, 'updated_at' => $now],
-        ];
+        ]);
         DB::table('product_variants')->insert($variants);
 
         // 7. Coupons (Mã giảm giá)

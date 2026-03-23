@@ -7,7 +7,9 @@
     $cartItems = collect();
     $cartTotal = 0;
     if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
-        $cartItems = Auth::user()->customer->cart->items()->with(['variant.product'])->get();
+        $cartItems = Auth::user()->customer->cart->items()->with([
+            'variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+        ])->get();
         foreach ($cartItems as $ci) {
             $basePrice  = $ci->variant->product->promotional_price ?: $ci->variant->product->price;
             $itemPrice  = $ci->variant->price_override ?: $basePrice;

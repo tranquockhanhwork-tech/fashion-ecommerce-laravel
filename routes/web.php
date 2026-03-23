@@ -59,7 +59,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/account', fn() => view('pages.account'))->name('account');
     Route::patch('/account', [App\Http\Controllers\AccountController::class, 'update'])->name('account.update');
     Route::get('/orders', function () {
-        $orders = App\Models\Order::with('items.variant.product')
+        $orders = App\Models\Order::with([
+            'items.variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+        ])
             ->where('customer_id', auth()->user()->customer?->id)
             ->latest()
             ->get();

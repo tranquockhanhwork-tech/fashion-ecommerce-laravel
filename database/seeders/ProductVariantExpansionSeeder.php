@@ -2,12 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Models\ProductVariant;
 use Carbon\Carbon;
+use Database\Seeders\Concerns\ResolvesVariantOptions;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class ProductVariantExpansionSeeder extends Seeder
 {
+    use ResolvesVariantOptions;
+
     /**
      * Seed additional product variants for demo/testing.
      */
@@ -15,12 +19,16 @@ class ProductVariantExpansionSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        DB::table('product_variants')
+        $cleanupSizeIds = $this->ensureSizeIds(['28', '29', '30', '31'])
+            ->values()
+            ->all();
+
+        ProductVariant::query()
             ->where('product_id', 8)
-            ->whereIn('size', ['28', '29', '30', '31'])
+            ->whereIn('size_id', $cleanupSizeIds)
             ->delete();
 
-        $variants = [
+        $variants = $this->prepareVariantPayloads([
             ['product_id' => 1, 'sku' => 'AOT-BASIC-TRANG-S', 'size' => 'S', 'color' => 'Trắng', 'stock_quantity' => 24],
             ['product_id' => 1, 'sku' => 'AOT-BASIC-TRANG-XL', 'size' => 'XL', 'color' => 'Trắng', 'stock_quantity' => 10],
             ['product_id' => 1, 'sku' => 'AOT-BASIC-DEN-S', 'size' => 'S', 'color' => 'Đen', 'stock_quantity' => 14],
@@ -78,7 +86,7 @@ class ProductVariantExpansionSeeder extends Seeder
             ['product_id' => 10, 'sku' => 'CV-A-DEN-L', 'size' => 'L', 'color' => 'Đen', 'stock_quantity' => 1],
             ['product_id' => 10, 'sku' => 'CV-A-NAU-M', 'size' => 'M', 'color' => 'Nâu', 'stock_quantity' => 6],
             ['product_id' => 10, 'sku' => 'CV-A-KEM-M', 'size' => 'M', 'color' => 'Kem', 'stock_quantity' => 0],
-        ];
+        ]);
 
         $payload = collect($variants)
             ->map(fn (array $variant) => array_merge($variant, [
@@ -91,7 +99,7 @@ class ProductVariantExpansionSeeder extends Seeder
         DB::table('product_variants')->upsert(
             $payload,
             ['sku'],
-            ['product_id', 'size', 'color', 'stock_quantity', 'price_override', 'updated_at']
+            ['product_id', 'size_id', 'color_id', 'stock_quantity', 'price_override', 'updated_at']
         );
     }
 }

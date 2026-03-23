@@ -86,7 +86,10 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        $order = Order::with(['customer', 'items.variant.product'])->findOrFail($id);
+        $order = Order::with([
+            'customer',
+            'items.variant' => fn ($query) => $query->withOptionRelations()->with('product.primaryImage'),
+        ])->findOrFail($id);
         return view('admin.orders.show', compact('order'));
     }
 

@@ -25,7 +25,9 @@ class DashboardController extends Controller
             ->get();
 
         // Biến thể sắp hết hàng và hết hàng chung một danh sách
-        $lowStockVariants = ProductVariant::with('product')
+        $lowStockVariants = ProductVariant::query()
+            ->withOptionRelations()
+            ->with('product')
             ->whereHas('product', fn ($query) => $query->where('is_active', true))
             ->where('stock_quantity', '<', 10)
             ->orderBy('stock_quantity')

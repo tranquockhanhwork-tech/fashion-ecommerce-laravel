@@ -6,10 +6,13 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use Database\Seeders\Concerns\ResolvesVariantOptions;
 use Illuminate\Database\Seeder;
 
 class HomeShowcaseProductSeeder extends Seeder
 {
+    use ResolvesVariantOptions;
+
     public function run(): void
     {
         $category = Category::query()
@@ -32,13 +35,13 @@ class HomeShowcaseProductSeeder extends Seeder
             ]
         );
 
-        $variants = [
+        $variants = $this->prepareVariantPayloads([
             ['sku' => 'PSS-BLACK-M', 'size' => 'M', 'color' => 'Den Midnight', 'stock_quantity' => 12],
             ['sku' => 'PSS-BLACK-L', 'size' => 'L', 'color' => 'Den Midnight', 'stock_quantity' => 10],
             ['sku' => 'PSS-BLACK-XL', 'size' => 'XL', 'color' => 'Den Midnight', 'stock_quantity' => 6],
             ['sku' => 'PSS-MOCHA-M', 'size' => 'M', 'color' => 'Mocha Gold', 'stock_quantity' => 8],
             ['sku' => 'PSS-MOCHA-L', 'size' => 'L', 'color' => 'Mocha Gold', 'stock_quantity' => 7],
-        ];
+        ]);
 
         foreach ($variants as $variant) {
             ProductVariant::query()->updateOrCreate(

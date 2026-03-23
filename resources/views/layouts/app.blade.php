@@ -56,7 +56,9 @@
         $sidebarItems = collect();
         $sidebarTotal = 0;
         if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
-            $sidebarItems = Auth::user()->customer->cart->items()->with(['variant.product'])->get();
+            $sidebarItems = Auth::user()->customer->cart->items()->with([
+                'variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+            ])->get();
             foreach ($sidebarItems as $si) {
                 $basePrice    = $si->variant->product->promotional_price ?: $si->variant->product->price;
                 $siPrice      = $si->variant->price_override ?: $basePrice;

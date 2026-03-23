@@ -5,11 +5,13 @@ namespace Tests\Feature;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Color;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Size;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -135,11 +137,20 @@ class CheckoutStockTest extends TestCase
             'is_active' => true,
         ]);
 
+        $size = Size::query()->create([
+            'name' => 'M',
+            'sort_order' => 30,
+        ]);
+
+        $color = Color::query()->create([
+            'name' => 'Black',
+        ]);
+
         $variant = ProductVariant::query()->create([
             'product_id' => $product->id,
+            'size_id' => $size->id,
+            'color_id' => $color->id,
             'sku' => 'TEST-' . strtoupper(Str::random(8)),
-            'size' => 'M',
-            'color' => 'Black',
             'stock_quantity' => $stockQuantity,
             'price_override' => null,
         ]);

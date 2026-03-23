@@ -83,7 +83,9 @@ class CartController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user && $user->customer && $user->customer->cart) {
-            $item = $user->customer->cart->items()->with('variant')->find($id);
+            $item = $user->customer->cart->items()->with([
+                'variant' => fn ($query) => $query->withOptionRelations(),
+            ])->find($id);
             if ($item) {
                 if ($item->variant && $request->quantity > $item->variant->stock_quantity) {
                     return response()->json([
@@ -108,7 +110,9 @@ class CartController extends Controller
             if ($item) {
                 $item->delete();
 
-                $cart = $user->customer->cart()->with('items.variant.product')->first();
+                $cart = $user->customer->cart()->with([
+                    'items.variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+                ])->first();
                 $cartItems = $cart?->items ?? collect();
                 $cartTotal = 0;
 

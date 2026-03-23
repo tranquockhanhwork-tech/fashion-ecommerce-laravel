@@ -46,6 +46,114 @@
         .admin-sidebar-footer-link:hover {
             color: #fff8ec !important;
         }
+
+        .admin-toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            width: min(420px, calc(100vw - 2rem));
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+            overflow: hidden;
+        }
+
+        .admin-toast.is-success {
+            border-color: #bbf7d0;
+        }
+
+        .admin-toast.is-error {
+            border-color: #fecaca;
+        }
+
+        .admin-toast__bar {
+            height: 4px;
+        }
+
+        .admin-toast.is-success .admin-toast__bar {
+            background: linear-gradient(90deg, #22c55e 0%, #86efac 100%);
+        }
+
+        .admin-toast.is-error .admin-toast__bar {
+            background: linear-gradient(90deg, #ef4444 0%, #fca5a5 100%);
+        }
+
+        .admin-toast__body {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .admin-toast__icon {
+            flex-shrink: 0;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .admin-toast.is-success .admin-toast__icon {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .admin-toast.is-error .admin-toast__icon {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .admin-toast__content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .admin-toast__title {
+            margin-bottom: 0.2rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .admin-toast__message {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: #374151;
+        }
+
+        .admin-toast__close {
+            flex-shrink: 0;
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0.15rem;
+        }
+
+        .admin-toast__close:hover {
+            color: #111827;
+        }
+
+        .admin-toast.is-hidden {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .admin-toast {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                width: auto;
+            }
+        }
     </style>
     @if(request()->routeIs('admin.categories.edit', 'admin.categories.create'))
     <style>
@@ -72,6 +180,25 @@
     @endif
 </head>
 <body class="admin-mode bg-gray-100 font-[Inter] text-gray-800">
+    @if(session('success') || session('error'))
+        @php
+            $toastType = session('error') ? 'error' : 'success';
+            $toastTitle = session('error') ? 'Không thể thực hiện' : 'Thành công';
+            $toastMessage = session('error') ?: session('success');
+            $toastIcon = session('error') ? '!' : '✓';
+        @endphp
+        <div class="admin-toast is-{{ $toastType }}" data-admin-toast role="alert" aria-live="assertive">
+            <div class="admin-toast__bar"></div>
+            <div class="admin-toast__body">
+                <span class="admin-toast__icon">{{ $toastIcon }}</span>
+                <div class="admin-toast__content">
+                    <div class="admin-toast__title">{{ $toastTitle }}</div>
+                    <div class="admin-toast__message">{{ $toastMessage }}</div>
+                </div>
+                <button type="button" class="admin-toast__close" data-dismiss-admin-toast aria-label="Đóng thông báo">&times;</button>
+            </div>
+        </div>
+    @endif
 
     <div class="flex h-screen overflow-hidden">
         {{-- Sidebar --}}
@@ -202,17 +329,6 @@
 
             {{-- Main Content --}}
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-                @if(session('success'))
-                    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if(session('error'))
-                    <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
                 @yield('content')
             </main>
         </div>
@@ -239,6 +355,21 @@
         });
     </script>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-dismiss-admin-toast]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const toast = button.closest('[data-admin-toast]');
+
+                    if (!toast) {
+                        return;
+                    }
+
+                    toast.classList.add('is-hidden');
+                });
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

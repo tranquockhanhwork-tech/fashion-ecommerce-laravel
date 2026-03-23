@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Color;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\Size;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ShopController extends Controller
 {
@@ -39,14 +44,14 @@ class ShopController extends Controller
         // Lọc theo size
         if ($request->filled('size')) {
             $query->whereHas('variants', function ($q) use ($request) {
-                $q->where('size', $request->size);
+                $q->whereSizeName($request->size);
             });
         }
 
         // Lọc theo màu sắc
         if ($request->filled('color')) {
             $query->whereHas('variants', function ($q) use ($request) {
-                $q->where('color', $request->color);
+                $q->whereColorName($request->color);
             });
         }
 
@@ -64,13 +69,25 @@ class ShopController extends Controller
             ->with(['children' => fn ($query) => $query->orderBy('name')])
             ->orderBy('name')
             ->get();
-        
-        $availableSizes = \App\Models\ProductVariant::whereHas('product', fn($q) => $q->where('is_active', true))->distinct()->pluck('size')->filter()->values();
-        $availableColors = \App\Models\ProductVariant::whereHas('product', fn($q) => $q->where('is_active', true))->distinct()->pluck('color')->filter()->values();
+
+        $availableSizes = Size::query()
+            ->whereHas('variants.product', fn ($query) => $query->where('is_active', true))
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name')
+            ->filter()
+            ->values();
+
+        $availableColors = Color::query()
+            ->whereHas('variants.product', fn ($query) => $query->where('is_active', true))
+            ->orderBy('name')
+            ->pluck('name')
+            ->filter()
+            ->values();
 
         $wishlistIds = [];
         if (auth()->check() && auth()->user()->customer) {
-            $wishlistIds = \App\Models\Wishlist::where('customer_id', auth()->user()->customer->id)
+            $wishlistIds = Wishlist::where('customer_id', auth()->user()->customer->id)
                 ->pluck('product_id')->toArray();
         }
 
@@ -83,13 +100,33 @@ class ShopController extends Controller
             ->with([
                 'category',
                 'images',
-                'variants',
+                'variants' => fn ($query) => $query->withOptionRelations(),
                 'reviews.customer',
             ])
             ->findOrFail($id);
 
         // Tăng lượt xem
         $product->increment('views');
+
+        $useOptionTables = ProductVariant::optionsAreAvailable();
+
+        $product->setRelation(
+            'variants',
+            $product->variants
+                ->sortBy(function ($variant) use ($useOptionTables) {
+                    $sizeOrder = $useOptionTables
+                        ? ($variant->sizeOption?->sort_order ?? 9999)
+                        : 9999;
+
+                    return sprintf(
+                        '%s|%05d|%s',
+                        Str::lower((string) $variant->color),
+                        $sizeOrder,
+                        Str::lower((string) $variant->size)
+                    );
+                })
+                ->values()
+        );
 
         // Nhóm biến thể theo màu và size để render selector + đồng bộ tồn kho ở frontend
         $variantsData = $product->variants
@@ -101,8 +138,25 @@ class ShopController extends Controller
             ])
             ->values();
 
-        $sizes  = $product->variants->pluck('size')->filter()->unique()->values();
-        $colors = $product->variants->pluck('color')->filter()->unique()->values();
+        $sizes = $product->variants
+            ->filter(fn ($variant) => trim((string) $variant->size) !== '')
+            ->sortBy(function ($variant) use ($useOptionTables) {
+                $sizeOrder = $useOptionTables
+                    ? ($variant->sizeOption?->sort_order ?? 9999)
+                    : 9999;
+
+                return sprintf('%05d|%s', $sizeOrder, Str::lower((string) $variant->size));
+            })
+            ->pluck('size')
+            ->unique()
+            ->values();
+
+        $colors = $product->variants
+            ->filter(fn ($variant) => trim((string) $variant->color) !== '')
+            ->sortBy(fn ($variant) => Str::lower((string) $variant->color))
+            ->pluck('color')
+            ->unique()
+            ->values();
 
         // Sản phẩm liên quan (cùng danh mục, loại trừ SP hiện tại)
         $relatedProducts = Product::where('is_active', true)
@@ -114,7 +168,7 @@ class ShopController extends Controller
 
         $wishlistIds = [];
         if (auth()->check() && auth()->user()->customer) {
-            $wishlistIds = \App\Models\Wishlist::where('customer_id', auth()->user()->customer->id)
+            $wishlistIds = Wishlist::where('customer_id', auth()->user()->customer->id)
                 ->pluck('product_id')->toArray();
         }
 

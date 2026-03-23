@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -86,7 +87,30 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = Product::with(['variants' => fn ($query) => $query->orderBy('color')->orderBy('size')])->findOrFail($id);
+        $product = Product::with([
+            'variants' => fn ($query) => $query->withOptionRelations(),
+        ])->findOrFail($id);
+
+        $useOptionTables = ProductVariant::optionsAreAvailable();
+
+        $product->setRelation(
+            'variants',
+            $product->variants
+                ->sortBy(function ($variant) use ($useOptionTables) {
+                    $sizeOrder = $useOptionTables
+                        ? ($variant->sizeOption?->sort_order ?? 9999)
+                        : 9999;
+
+                    return sprintf(
+                        '%s|%05d|%s',
+                        Str::lower((string) $variant->color),
+                        $sizeOrder,
+                        Str::lower((string) $variant->size)
+                    );
+                })
+                ->values()
+        );
+
         $categories = Category::all();
         return view('admin.products.edit', compact('product', 'categories'));
     }
@@ -175,7 +199,7 @@ class ProductController extends Controller
         if ($hasOrderHistory) {
             return redirect()
                 ->route('admin.products.index')
-                ->with('error', 'Khong the xoa san pham da phat sinh don hang. Ban nen an san pham thay vi xoa.');
+                ->with('error', 'Không thể xóa sản phẩm đã phát sinh đơn hàng. Bạn nên ẩn sản phẩm thay vì xóa.');
         }
 
         $imagePaths = $product->images
