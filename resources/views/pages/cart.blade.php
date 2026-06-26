@@ -3,20 +3,6 @@
 @section('title', 'Giỏ Hàng')
 
 @section('content')
-@php
-    $cartItems = collect();
-    $cartTotal = 0;
-    if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
-        $cartItems = Auth::user()->customer->cart->items()->with([
-            'variant' => fn ($query) => $query->withOptionRelations()->with('product.images'),
-        ])->get();
-        foreach ($cartItems as $ci) {
-            $basePrice  = $ci->variant->product->promotional_price ?: $ci->variant->product->price;
-            $itemPrice  = $ci->variant->price_override ?: $basePrice;
-            $cartTotal += $itemPrice * $ci->quantity;
-        }
-    }
-@endphp
 
 <div class="min-h-screen bg-[#0A0A0A]">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

@@ -7,6 +7,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Account\OrderController as AccountOrderController;
 
 /* ===================== MAIN ROUTES ===================== */
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -47,26 +49,18 @@ Route::prefix('shipping')->name('shipping.')->group(function () {
 use App\Http\Controllers\AuthController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', fn() => view('auth.login'))->name('login');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     
-    Route::get('/register', fn() => view('auth.register'))->name('register');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/account', fn() => view('pages.account'))->name('account');
-    Route::patch('/account', [App\Http\Controllers\AccountController::class, 'update'])->name('account.update');
-    Route::get('/orders', function () {
-        $orders = App\Models\Order::with([
-            'items.variant' => fn ($query) => $query->withOptionRelations()->with('product'),
-        ])
-            ->where('customer_id', auth()->user()->customer?->id)
-            ->latest()
-            ->get();
-        return view('pages.orders', compact('orders'));
-    })->name('orders.index');
+    Route::get('/account', [AccountController::class, 'index'])->name('account');
+    Route::patch('/account', [AccountController::class, 'update'])->name('account.update');
+    Route::get('/orders', [AccountOrderController::class, 'index'])->name('orders.index');
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist');
     Route::post('/wishlist/toggle', [\App\Http\Controllers\WishlistController::class, 'toggle'])->name('wishlist.toggle');
 

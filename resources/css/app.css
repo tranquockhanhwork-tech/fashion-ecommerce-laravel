@@ -730,6 +730,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Tailwind Arbitrary Value Overrides */
 .light-mode .bg-\[\#0A0A0A\] { background-color: #FFFFFF !important; }
 .light-mode .bg-\[\#080808\] { background-color: #FFFFFF !important; }
+.light-mode .bg-\[\#0d0d0d\] { background-color: #FFFDF8 !important; }
 .light-mode .bg-\[\#111\],
 .light-mode .bg-\[\#111111\] { background-color: var(--color-dark-card) !important; }
 .light-mode .bg-\[\#111\]\/80 { background-color: rgba(255, 248, 238, 0.88) !important; }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
 use App\Models\User;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -12,6 +13,16 @@ use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
+    public function showLogin(): View
+    {
+        return view('auth.login');
+    }
+
+    public function showRegister(): View
+    {
+        return view('auth.register');
+    }
+
     public function login(Request $request)
     {
         $credentials = $request->validate([

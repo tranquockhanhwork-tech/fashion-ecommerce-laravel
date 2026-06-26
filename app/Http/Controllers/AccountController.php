@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
+    public function index(): View
+    {
+        return view('pages.account');
+    }
+
     public function update(Request $request)
     {
         $request->validate([

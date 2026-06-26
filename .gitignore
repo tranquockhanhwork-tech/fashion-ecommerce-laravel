@@ -19,6 +19,14 @@
 /storage/*.key
 /storage/pail
 /vendor
+AGENTS.md
+/agent
+/.agents
+/.codex
 Homestead.json
 Homestead.yaml
 Thumbs.db
+debug_upload_env.php
+out_order*.json
+stderr.txt
+sort_order

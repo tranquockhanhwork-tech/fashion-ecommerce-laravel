@@ -41,7 +41,7 @@ class ViettelPostService
             ]);
 
             if (!$loginRes->successful()) {
-                Log::error('[ViettelPost] Login failed', ['body' => $loginRes->body()]);
+                Log::error('[ViettelPost] Login failed', ['status' => $loginRes->status()]);
                 return null;
             }
 
@@ -53,7 +53,7 @@ class ViettelPostService
                 ->get("{$this->baseUrl}/user/ownerconnect");
 
             if (!$tokenRes->successful()) {
-                Log::error('[ViettelPost] Get long-term token failed', ['body' => $tokenRes->body()]);
+                Log::error('[ViettelPost] Get long-term token failed', ['status' => $tokenRes->status()]);
                 return $tempToken; // Fallback dùng temp token
             }
 
@@ -96,14 +96,14 @@ class ViettelPostService
                 ]);
 
             if (!$res->successful()) {
-                Log::error('[ViettelPost] calculateFee getPriceAll failed', ['body' => $res->body()]);
+                Log::error('[ViettelPost] calculateFee getPriceAll failed', ['status' => $res->status()]);
                 return null;
             }
             $rawData = $res->json();
 
             // Nếu API trả về mảng có key error và status là lỗi
             if (isset($rawData['error']) && $rawData['error'] == true) {
-                 Log::error('[ViettelPost] calculateFee no price applied', ['body' => $res->body()]);
+                 Log::error('[ViettelPost] calculateFee no price applied', ['status' => $res->status()]);
                  return []; 
             }
 
@@ -163,7 +163,7 @@ class ViettelPostService
                 ->post("{$this->baseUrl}/order/createOrder", $payload);
 
             if (!$res->successful()) {
-                Log::error('[ViettelPost] createOrder failed', ['body' => $res->body()]);
+                Log::error('[ViettelPost] createOrder failed', ['status' => $res->status()]);
                 return null;
             }
 
@@ -191,7 +191,7 @@ class ViettelPostService
                 ]);
 
             if (!$res->successful()) {
-                Log::error('[ViettelPost] trackOrder failed', ['body' => $res->body()]);
+                Log::error('[ViettelPost] trackOrder failed', ['status' => $res->status()]);
                 return null;
             }
 
@@ -202,7 +202,7 @@ class ViettelPostService
         }
     }
 
-    /* ===================== DANH SÁCH TỈNH/HUYỆN/XÃ ===================== */
+    /* ===================== PROVINCE/DISTRICT/WARD LIST ===================== */
 
     public function getProvinces(): array
     {

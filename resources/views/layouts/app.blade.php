@@ -52,20 +52,6 @@
     @include('partials.navbar')
 
     {{-- Cart Sidebar --}}
-    @php
-        $sidebarItems = collect();
-        $sidebarTotal = 0;
-        if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
-            $sidebarItems = Auth::user()->customer->cart->items()->with([
-                'variant' => fn ($query) => $query->withOptionRelations()->with('product.images'),
-            ])->get();
-            foreach ($sidebarItems as $si) {
-                $basePrice    = $si->variant->product->promotional_price ?: $si->variant->product->price;
-                $siPrice      = $si->variant->price_override ?: $basePrice;
-                $sidebarTotal += $siPrice * $si->quantity;
-            }
-        }
-    @endphp
     <div id="cart-overlay" class="cart-overlay"></div>
     <aside id="cart-sidebar" class="cart-sidebar flex flex-col">
         <div class="flex items-center justify-between p-6 border-b border-[#1a1a1a]">
@@ -160,7 +146,7 @@
 
     @include('partials.footer')
 
-    @stack('scripts')
+
 
     <script>
         // Xử lý Thêm / Xoá Yêu Thích 
@@ -204,8 +190,8 @@
                         </svg>
                     `;
                 }
-            } catch(err) {
-                console.log('Lỗi:', err);
+            } catch (err) {
+                // Ignore wishlist UI errors; the next interaction can retry.
             }
         });
     </script>

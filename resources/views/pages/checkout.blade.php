@@ -278,7 +278,7 @@
 const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
 const APP_URLS = window.appConfig?.urls || {};
 
-/* ===== CHỌN ĐỊA CHỈ ĐÃ LƯU ===== */
+/* ===== SELECT SAVED ADDRESS ===== */
 let _currentAddress = null;
 
 function onSelectAddress(radio) {

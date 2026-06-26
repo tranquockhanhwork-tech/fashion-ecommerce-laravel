@@ -8,7 +8,24 @@ class CartController extends Controller
 {
     public function index(): \Illuminate\View\View
     {
-        return view('pages.cart');
+        $cartItems = collect();
+        $cartTotal = 0;
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $cart = $user?->customer?->cart;
+
+        if ($cart) {
+            $cartItems = $cart->items()->with([
+                'variant' => fn ($query) => $query->withOptionRelations()->with('product.images'),
+            ])->get();
+
+            foreach ($cartItems as $cartItem) {
+                $basePrice = $cartItem->variant->product->promotional_price ?: $cartItem->variant->product->price;
+                $itemPrice = $cartItem->variant->price_override ?: $basePrice;
+                $cartTotal += $itemPrice * $cartItem->quantity;
+            }
+        }
+
+        return view('pages.cart', compact('cartItems', 'cartTotal'));
     }
 
     public function add(Request $request): \Illuminate\Http\JsonResponse
