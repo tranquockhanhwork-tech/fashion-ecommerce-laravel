@@ -1,8 +1,0 @@
-<?php
-require __DIR__ . '/vendor/autoload.php';
-$app = require_once __DIR__ . '/bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-foreach (App\Models\CustomerAddress::all() as $a) {
-    echo "ID: {$a->id}, Prov: {$a->province_id}, Dist: {$a->district_id}\n";
-}
