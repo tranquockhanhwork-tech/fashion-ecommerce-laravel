@@ -8,7 +8,7 @@
     $cartTotal = 0;
     if (Auth::check() && Auth::user()->customer && Auth::user()->customer->cart) {
         $cartItems = Auth::user()->customer->cart->items()->with([
-            'variant' => fn ($query) => $query->withOptionRelations()->with('product'),
+            'variant' => fn ($query) => $query->withOptionRelations()->with('product.images'),
         ])->get();
         foreach ($cartItems as $ci) {
             $basePrice  = $ci->variant->product->promotional_price ?: $ci->variant->product->price;
@@ -41,7 +41,7 @@
                 @php
                     $basePrice = $ci->variant->product->promotional_price ?: $ci->variant->product->price;
                     $itemPrice = $ci->variant->price_override ?: $basePrice;
-                    $img       = $ci->variant->product->thumbnail;
+                    $img       = $ci->variant->product->resolveThumbnailForColor($ci->variant->color_id);
                     $prodId    = $ci->variant->product_id;
                 @endphp
                 <div class="bg-[#111] border border-[#1a1a1a] p-5 flex gap-5 hover:border-[#2a2a2a] transition-colors" data-cart-item="{{ $ci->id }}">

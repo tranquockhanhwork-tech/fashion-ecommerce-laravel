@@ -190,6 +190,20 @@ class ShopController extends Controller
             })
             ->all();
 
+        $colorPreviewImages = $colors
+            ->map(function (string $colorName) use ($galleryByColor, $galleryDefault, $product) {
+                $gallery = $galleryByColor[$colorName] ?? $galleryDefault;
+                $preview = collect($gallery)
+                    ->first(fn ($image) => trim((string) ($image['src'] ?? '')) !== '');
+
+                return [
+                    'color' => $colorName,
+                    'src' => $preview['src'] ?? $product->thumbnail,
+                    'alt' => $preview['alt'] ?? ($product->name . ' - ' . $colorName),
+                ];
+            })
+            ->values();
+
         // Sản phẩm liên quan (cùng danh mục, loại trừ SP hiện tại)
         $relatedProducts = Product::where('is_active', true)
             ->where('category_id', $product->category_id)
@@ -211,6 +225,7 @@ class ShopController extends Controller
             'variantsData',
             'galleryDefault',
             'galleryByColor',
+            'colorPreviewImages',
             'relatedProducts',
             'wishlistIds'
         ));

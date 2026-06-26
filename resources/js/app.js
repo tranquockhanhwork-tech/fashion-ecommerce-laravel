@@ -407,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const galleryByColor = parseJsonDataset(productDetail.dataset.galleryByColor, {});
         const colorButtons = Array.from(productDetail.querySelectorAll('[data-variant-color]'));
         const sizeButtons = Array.from(productDetail.querySelectorAll('[data-variant-size]'));
+        const colorPreviewButtons = Array.from(document.querySelectorAll('[data-color-preview]'));
         const selectedColorLabel = productDetail.querySelector('#selected-color');
         const selectedSizeLabel = productDetail.querySelector('#selected-size');
         const stockStatus = productDetail.querySelector('#product-stock-status');
@@ -504,6 +505,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         };
 
+        const renderColorPreviewState = () => {
+            colorPreviewButtons.forEach((button) => {
+                const colorValue = button.dataset.colorPreview;
+                const enabled = hasAvailableVariant({ color: colorValue });
+                const active = enabled && selectedColor === colorValue;
+
+                button.disabled = !enabled;
+                button.classList.toggle('product-color-preview-active', active);
+                button.classList.toggle('product-color-preview-disabled', !enabled);
+            });
+        };
+
         const updateOptionState = (buttons, key, selectedValue, dependencyKey, dependencyValue) => {
             buttons.forEach((button) => {
                 const optionValue = button.dataset[key];
@@ -521,6 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const renderSelection = () => {
             updateOptionState(colorButtons, 'variantColor', selectedColor, 'variantSize', selectedSize);
             updateOptionState(sizeButtons, 'variantSize', selectedSize, 'variantColor', selectedColor);
+            renderColorPreviewState();
 
             if (selectedColorLabel) {
                 selectedColorLabel.textContent = selectedColor || 'Chưa chọn';
@@ -570,17 +584,27 @@ document.addEventListener('DOMContentLoaded', () => {
             syncGalleryWithColor();
         };
 
+        const handleColorSelection = (nextColor) => {
+            selectedColor = selectedColor === nextColor ? null : nextColor;
+
+            if (selectedSize && !hasAvailableVariant({ color: selectedColor, size: selectedSize })) {
+                selectedSize = null;
+            }
+
+            renderSelection();
+        };
+
         colorButtons.forEach((button) => {
             button.addEventListener('click', () => {
                 if (button.disabled) return;
-                const nextColor = button.dataset.variantColor;
-                selectedColor = selectedColor === nextColor ? null : nextColor;
+                handleColorSelection(button.dataset.variantColor);
+            });
+        });
 
-                if (selectedSize && !hasAvailableVariant({ color: selectedColor, size: selectedSize })) {
-                    selectedSize = null;
-                }
-
-                renderSelection();
+        colorPreviewButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                if (button.disabled) return;
+                handleColorSelection(button.dataset.colorPreview);
             });
         });
 

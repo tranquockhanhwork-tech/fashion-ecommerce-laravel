@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Size;
 use App\Models\User;
@@ -87,6 +88,37 @@ class CheckoutStockTest extends TestCase
             'product_variant_id' => $variant->id,
             'quantity' => 2,
         ]);
+    }
+
+    public function test_cart_displays_color_specific_image_for_selected_variant(): void
+    {
+        [$user, $customer, $address, $variant] = $this->makeCheckoutContext(stockQuantity: 4, cartQuantity: 1);
+
+        ProductImage::query()->create([
+            'product_id' => $variant->product_id,
+            'product_variant_id' => null,
+            'color_id' => null,
+            'image_url' => 'products/default-shirt.jpg',
+            'alt_text' => 'Default shirt image',
+            'is_primary' => true,
+            'sort_order' => 1,
+        ]);
+
+        ProductImage::query()->create([
+            'product_id' => $variant->product_id,
+            'product_variant_id' => null,
+            'color_id' => $variant->color_id,
+            'image_url' => 'products/black-shirt.jpg',
+            'alt_text' => 'Black shirt image',
+            'is_primary' => false,
+            'sort_order' => 2,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('cart.index'));
+
+        $response->assertOk();
+        $response->assertSee(asset('storage/products/black-shirt.jpg'), false);
+        $response->assertDontSee(asset('storage/products/default-shirt.jpg'), false);
     }
 
     /**

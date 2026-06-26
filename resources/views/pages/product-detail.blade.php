@@ -28,26 +28,43 @@
 
         {{-- Image Gallery --}}
         <div class="flex gap-4">
-            {{-- Thumbnails --}}
-            <div class="flex flex-col gap-3" data-gallery-thumbs>
-                @foreach($galleryDefault as $image)
-                <button
-                    type="button"
-                    data-gallery-thumb
-                    data-gallery-src="{{ $image['src'] }}"
-                    data-gallery-alt="{{ $image['alt'] }}"
-                    class="w-16 h-20 overflow-hidden border-2 cursor-pointer transition-colors {{ $loop->first ? 'border-[#C5A572]' : 'border-[#2a2a2a]' }}"
-                    style="border-color: {{ $loop->first ? '#C5A572' : '#2a2a2a' }};"
-                >
-                    <img src="{{ $image['src'] }}" alt="{{ $image['alt'] }}" class="w-full h-full object-cover">
-                </button>
-                @endforeach
+            <div class="product-gallery-side">
+                @if($colorPreviewImages->isNotEmpty())
+                <div class="product-gallery-rail">
+                    <div class="product-gallery-rail-title">Màu</div>
+                    <div class="flex flex-col gap-3" data-color-previews>
+                        @foreach($colorPreviewImages as $preview)
+                        <button
+                            type="button"
+                            data-color-preview="{{ $preview['color'] }}"
+                            class="product-color-preview"
+                            title="{{ $preview['color'] }}"
+                        >
+                            <img src="{{ $preview['src'] }}" alt="{{ $preview['alt'] }}" class="w-full h-full object-cover">
+                            <span class="product-color-preview-label">{{ $preview['color'] }}</span>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
             {{-- Ảnh chính --}}
             <div class="flex-1 aspect-[4/5] bg-[#111] overflow-hidden">
                 <img data-gallery-main src="{{ $initialGalleryImage['src'] }}" alt="{{ $initialGalleryImage['alt'] }}"
                      class="w-full h-full object-cover transition-opacity duration-300">
             </div>
+        </div>
+        <div class="hidden" data-gallery-thumbs>
+            @foreach($galleryDefault as $image)
+            <button
+                type="button"
+                data-gallery-thumb
+                data-gallery-src="{{ $image['src'] }}"
+                data-gallery-alt="{{ $image['alt'] }}"
+            >
+                <img src="{{ $image['src'] }}" alt="{{ $image['alt'] }}">
+            </button>
+            @endforeach
         </div>
 
         {{-- Product Info --}}
@@ -180,11 +197,11 @@
             </div>
 
             @auth
-            <button class="btn-primary w-full py-4 text-sm bg-[#1a1a1a] text-white hover:bg-[#C5A572] hover:text-black opacity-50 cursor-not-allowed" data-buy-now disabled>
+            <button class="btn-primary w-full py-4 text-sm bg-gradient-to-r from-[#d2b07a] via-[#C5A572] to-[#af8c55] text-black shadow-[0_14px_32px_rgba(197,165,114,0.22)] hover:from-[#dcc08e] hover:via-[#cfb07c] hover:to-[#b69258] opacity-50 cursor-not-allowed" data-buy-now disabled>
                 Mua Ngay
             </button>
             @else
-            <a href="{{ route('login') }}" class="btn-primary flex items-center justify-center w-full py-4 text-sm bg-[#1a1a1a] text-white hover:bg-[#C5A572] hover:text-black">
+            <a href="{{ route('login') }}" class="btn-primary flex items-center justify-center w-full py-4 text-sm bg-gradient-to-r from-[#d2b07a] via-[#C5A572] to-[#af8c55] text-black shadow-[0_14px_32px_rgba(197,165,114,0.22)] hover:from-[#dcc08e] hover:via-[#cfb07c] hover:to-[#b69258]">
                 Mua Ngay
             </a>
             @endauth
@@ -267,3 +284,97 @@
 </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.product-gallery-side {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.product-gallery-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.product-gallery-rail-title {
+    color: #9ca3af;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.product-color-preview {
+    position: relative;
+    width: 4rem;
+    height: 5rem;
+    overflow: hidden;
+    border: 1px solid #2a2a2a;
+    background: #111;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.product-color-preview:hover {
+    border-color: #C5A572;
+    transform: translateX(2px);
+}
+
+.product-color-preview-active {
+    border-color: #C5A572;
+    box-shadow: 0 0 0 1px rgba(197, 165, 114, 0.24);
+    transform: translateX(2px);
+}
+
+.product-color-preview-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.product-color-preview-label {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 0.22rem 0.35rem;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.82));
+    color: #f8fafc;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.light-mode .product-color-preview {
+    background: #fffaf2;
+    border-color: rgba(197, 165, 114, 0.22);
+}
+
+.light-mode .product-color-preview-active {
+    border-color: #C5A572;
+}
+
+.light-mode .product-color-preview-label {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(47, 36, 23, 0.76));
+}
+
+@media (max-width: 640px) {
+    .product-gallery-side {
+        flex-direction: column;
+    }
+
+    .product-gallery-rail {
+        gap: 0.5rem;
+    }
+
+    .product-gallery-rail [data-color-previews],
+    .product-gallery-rail [data-gallery-thumbs] {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}
+</style>
+@endpush
